@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Story App</string>
+    <string name="enter_email">Email</string>
+    <string name="enter_password">Password</string>
+    <string name="login">Masuk</string>
+    <string name="logo_app">Logo Login</string>
+    <string name="weak_password">Password kurang dari 6 digit</string>
+    <string name="email_not_valid">Email tidak valid</string>
+    <string name="form_required">form harus diisi</string>
+    <string name="enter_name">Name</string>
+    <string name="register">Daftar</string>
+    <string name="loading">Memuat..</string>
+    <string name="register_here">Tidak punya akun? daftar disini</string>
+    <string name="login_here">Punya akun? masuk disini.</string>
+    <string name="menu_logout">Keluar</string>
+    <string name="image_detail">Detail gambar</string>
+    <string name="add_stories">tambah story</string>
+    <string name="enter_description">Masukkan deskripsi</string>
+    <string name="upload">Unggah</string>
+    <string name="add_from_camera">kamera</string>
+    <string name="add_from_gallery">gallery</string>
+    <string name="preview_image">Pratinjau gambar</string>
+    <string name="granted_camera_permission">Izinkan aplikasi menggunakan kamera untuk menggambil gambar</string>
+    <string name="choose_picture">pilih gambar</string>
+    <string name="change_language">Ganti bahasa</string>
+    <string name="image_empty">Silahkan pilih gambar dulu</string>
+    <string name="warning_exit">Perhatian</string>
+    <string name="message_exit">Yakin mau logout?</string>
+    <string name="cancel">Batal</string>
+    <string name="ok">Oke</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">tambah widget</string>
+    <string name="app_widget_description">Ini deskripsi widget</string>
+    <string name="empty_text">Teks kosong</string>
+    <string name="data_empty">Data Kosong</string>
+</resources>

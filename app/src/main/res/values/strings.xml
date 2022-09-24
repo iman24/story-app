@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Story App</string>
+    <string name="enter_email">Email</string>
+    <string name="enter_password">Password</string>
+    <string name="login">Sign In</string>
+    <string name="logo_app">Logo Login</string>
+    <string name="weak_password">Password less than 6 characters</string>
+    <string name="email_not_valid">Email not valid</string>
+    <string name="form_required">Form required</string>
+    <string name="enter_name">Name</string>
+    <string name="register">Register</string>
+    <string name="loading">Loading</string>
+    <string name="register_here">No have account? Register here</string>
+    <string name="login_here">Already have account? Login here!</string>
+    <string name="menu_logout">Logout</string>
+    <string name="image_detail">Image Detail</string>
+    <string name="add_stories">Add story</string>
+    <string name="enter_description">Enter description</string>
+    <string name="upload">Upload</string>
+    <string name="add_from_camera">camera</string>
+    <string name="add_from_gallery">gallery</string>
+    <string name="preview_image">Preview image</string>
+    <string name="granted_camera_permission">Give permission to access camera this app</string>
+    <string name="choose_picture">choose picture</string>
+    <string name="change_language">Change language</string>
+    <string name="image_empty">Please select image or take from camera</string>
+    <string name="warning_exit">Warning</string>
+    <string name="message_exit">Aro you sure to logout?</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">Ok</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="app_widget_description">This is an app widget description</string>
+    <string name="empty_text">Empty Text</string>
+    <string name="data_empty">No Data</string>
+</resources>
