@@ -1,0 +1,51 @@
+{
+  "error": false,
+  "message": "Stories fetched successfully",
+  "listStory": [
+    {
+      "id": "story-ZBk-FmRMTBV71Hhf",
+      "name": "Dicoding",
+      "description": "Jadi Developer Harus Berani Keluar Zona Nyaman",
+      "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1648720795526_877kLrZI.jpg",
+      "createdAt": "2022-03-31T09:59:55.530Z",
+      "lat": -7.9786395,
+      "lon": 112.5617421
+    },
+    {
+      "id": "story-Yk89TWuHxSYsE-1u",
+      "name": "Dicoding",
+      "description": "Because for me, in this tough times, Bangkit represents hope. Only in Bangkit..a person like me..can study with the best curriculum and best experts. Thanks to Bangkit, now I aspire to be a machine learning specialist!",
+      "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1648720737599_XbEPxqHS.jpg",
+      "createdAt": "2022-03-31T09:58:57.600Z",
+      "lat": -7.4730525,
+      "lon": 110.1825048
+    },
+    {
+      "id": "story-daqkGOdCARqApatM",
+      "name": "Dicoding",
+      "description": "Jika sudah berusaha maksimal, saatnya berserah diri. Dengan sikap ikhlas ini, meski gagal sekalipun, tidak jadi soal. Pasti itu hal terbaik yang dipercayakan pada kita untuk saat ini.",
+      "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1648720672402_JwvDCowd.jpg",
+      "createdAt": "2022-03-31T09:57:52.403Z",
+      "lat": -7.9786395,
+      "lon": 112.5617421
+    },
+    {
+      "id": "story-QkK0bSX6pdCS6GU7",
+      "name": "Dicoding",
+      "description": "Agar sukses (meniti karir), “belajar jangan hanya di kampus saja!",
+      "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1648720583566_jD27n82O.png",
+      "createdAt": "2022-03-31T09:56:23.567Z",
+      "lat": -6.9733165,
+      "lon": 107.6281415
+    },
+    {
+      "id": "story-FPkiCfHWfRpjwiY0",
+      "name": "Dicoding",
+      "description": "Jika sudah cinta programming, maka belajar ngoding pun terasa lebih mudah dan enjoy",
+      "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1648719567500_ssbAAkGs.png",
+      "createdAt": "2022-03-31T09:39:27.502Z",
+      "lat": -6.0019502,
+      "lon": 106.0662807
+    }
+  ]
+}

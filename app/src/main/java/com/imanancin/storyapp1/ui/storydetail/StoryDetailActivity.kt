@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
-import com.imanancin.storyapp1.data.remote.response.StoryItem
+import com.imanancin.storyapp1.data.local.entity.StoryEntity
 import com.imanancin.storyapp1.databinding.ActivityStoryDetailBinding
 
 
@@ -20,7 +20,7 @@ class StoryDetailActivity : AppCompatActivity() {
     }
 
     private fun setUpUi() {
-        val data = intent.extras?.getParcelable<StoryItem>(EXTRA_DATA)
+        val data = intent.extras?.getParcelable<StoryEntity>(EXTRA_DATA)
         binding.apply {
             data?.apply {
                 tvDetailName.text = name

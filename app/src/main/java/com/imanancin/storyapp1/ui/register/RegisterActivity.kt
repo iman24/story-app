@@ -12,7 +12,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import com.imanancin.storyapp1.R
-import com.imanancin.storyapp1.data.remote.Result
+import com.imanancin.storyapp1.data.remote.Results
 import com.imanancin.storyapp1.databinding.ActivityRegisterBinding
 import com.imanancin.storyapp1.ui.customviews.EditTextCustomView
 import com.imanancin.storyapp1.ViewModelFactory
@@ -116,16 +116,16 @@ class RegisterActivity : AppCompatActivity(), View.OnClickListener {
                 ).observe(activity) { result ->
                     if(result != null) {
                         when(result) {
-                            is Result.Loading -> {
+                            is Results.Loading -> {
                                 showLoading(true)
                             }
-                            is Result.Success -> {
+                            is Results.Success -> {
                                 Intent(activity, StoriesActivity::class.java).apply {
                                     startActivity(this)
                                     finish()
                                 }
                             }
-                            is Result.Error -> {
+                            is Results.Error -> {
                                 Toast.makeText(activity, "Invalid Login", Toast.LENGTH_SHORT).show()
                                 showLoading(false)
                             }

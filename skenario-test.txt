@@ -1,0 +1,35 @@
+# scenario tes login (LoginViewModel)
+1. Saat berhasil login
+    - Memastikan data tidak null
+    - Memastikan data mengembalikan Result.Success
+    - Memastikan token tersedia
+2. Saat gagal login
+    - memastikan data tidak null
+    - memastikan data mengembalikkan Result.Error
+
+# sceneario register (RegisterViewModel)
+1. saat berhasil register
+    - Memastikan data tidak null
+    - Memastikan data mengembalikan Result.Success
+2. Saat gagal register
+    - Memastikan data tidak null
+    - Memastikan data mengembalikkan Result.Error
+
+
+# scenario tambah story (AddStoryViewModel)
+1. saat berhasil menambah story
+    - memastikan data tidak null
+    - memastikan data mengembalikkan Result.SUccess
+
+
+# scenarion mengambil data story (StoryViewModel)
+1. saat berhasil mengambil data story
+    - memastikan data tidak null
+    - memastikan status Result.Success adalah true
+    - memastikan status Result.Error adalalah false
+    - memastikan jumlah data tidak sama dengan 0
+
+2. saat gagal mengambil data story
+    - memastikan data null
+    - memastikan status Result.Error true
+    - memastikan status Result.Success false

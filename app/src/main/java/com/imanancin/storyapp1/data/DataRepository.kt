@@ -2,12 +2,12 @@ package com.imanancin.storyapp1.data
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
-import com.imanancin.storyapp1.data.remote.ApiInterface
-import com.imanancin.storyapp1.data.remote.Result
-import com.imanancin.storyapp1.data.remote.response.CommonResponse
-import com.imanancin.storyapp1.data.remote.response.DataStoriesResponse
-import com.imanancin.storyapp1.data.remote.response.LoginResponse
-import com.imanancin.storyapp1.data.remote.response.StoryItem
+import androidx.paging.*
+import com.imanancin.storyapp1.data.local.database.StoryDatabase
+import com.imanancin.storyapp1.data.local.entity.StoryEntity
+import com.imanancin.storyapp1.data.remote.ApiService
+import com.imanancin.storyapp1.data.remote.Results
+import com.imanancin.storyapp1.data.remote.response.*
 import com.imanancin.storyapp1.model.UserSession
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -20,12 +20,14 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 
 class DataRepository(
-    private val apiConfig: ApiInterface,
-    private val userPreferences: UserPreferences
+    private val apiConfig: ApiService,
+    private val userPreferences: UserPreferences,
+    private val storyDatabase: StoryDatabase
 ) {
 
-    fun doLogin(email: String, password: String): LiveData<Result<LoginResponse>> = liveData {
-        emit(Result.Loading)
+    fun doLogin(email: String, password: String): LiveData<Results<LoginResponse>> = liveData {
+
+        emit(Results.Loading)
         try {
             val response = apiConfig.doLogin(email, password)
             if(response.error == false) {
@@ -34,10 +36,13 @@ class DataRepository(
                     response.loginResult?.token,
                     response.loginResult?.userId
                 ))
+                emit(Results.Success(response))
+            } else {
+                response.message?.let { Results.Error<String>(it) }
             }
-            emit(Result.Success(response))
+
         } catch (e: Exception) {
-            emit(Result.Error(e.message.toString()))
+            e.printStackTrace()
         }        
     }
 
@@ -45,35 +50,56 @@ class DataRepository(
         name: String,
         email: String,
         password: String
-    ): LiveData<Result<CommonResponse>> = liveData {
-        emit(Result.Loading)
+    ): LiveData<Results<CommonResponse>> = liveData {
+        emit(Results.Loading)
         try {
             val response = apiConfig.doRegister(name, email, password)
-            emit(Result.Success(response))
+            emit(Results.Success(response))
         } catch (e: Exception) {
-            emit(Result.Error(e.message.toString()))
+            emit(Results.Error(e.message.toString()))
         }
     }
 
 
-
-    fun getListStory() : LiveData<Result<DataStoriesResponse>> = liveData {
-        emit(Result.Loading)
-        try {
-            val response = apiConfig.getAllStories("Bearer ${getToken()}")
-            emit(Result.Success(response))
-        } catch (e: Exception) {
-            emit(Result.Error(e.message.toString()))
-        }
-    }
-
-    fun storyWidget(): Flow<List<StoryItem>> = flow {
-        try {
-            val response = apiConfig.getAllStories("Bearer ${getToken()}")
-            val data = arrayListOf<StoryItem>()
-            response.listStory?.forEach {
-                data.add(it)
+    @OptIn(ExperimentalPagingApi::class)
+    fun getListStory() : LiveData<PagingData<StoryEntity>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 5
+            ),
+            remoteMediator = StoryRemoteMediator(storyDatabase, apiConfig),
+            pagingSourceFactory = {
+                storyDatabase.storyDao().getAllStory()
             }
+        ).liveData
+
+    }
+
+    fun getListStoryMaps() : LiveData<Results<DataStoriesResponse>> = liveData {
+                emit(Results.Loading)
+        try {
+            val response = apiConfig.getAllStories()
+            emit(Results.Success(response))
+        } catch (e: Exception) {
+            emit(Results.Error(e.message.toString()))
+        }
+    }
+
+    fun storyWidget(): Flow<List<Stories>> = flow {
+        try {
+            val response = apiConfig.getAllStories()
+            val data = response.listStory.map { story ->
+                    with(story) {
+                        Stories(
+                           photoUrl = photoUrl,
+                           createdAt = createdAt,
+                           name = name,
+                           description = description,
+                           lon = lon,
+                           id = id,
+                           lat = lat)
+                    }
+                }
             emit(data)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -81,31 +107,36 @@ class DataRepository(
     }
 
 
-    fun uploadImage(file: File, description: String): LiveData<Result<CommonResponse>> = liveData {
-        emit(Result.Loading)
+    fun addStory(file: File, description: String, lat: Double, lon: Double): LiveData<Results<CommonResponse>> = liveData {
+        emit(Results.Loading)
         try {
+            val token = userPreferences.getUserSession().first().token.toString()
             val desc = description.toRequestBody("text/plain".toMediaType())
+            val latitude = lat.toFloat()
+            val longitude = lon.toFloat()
             val requestImageFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
             val imageMultipart: MultipartBody.Part = MultipartBody.Part.createFormData("photo", file.name, requestImageFile)
-            val response = apiConfig.uploadImage("Bearer ${getToken()}", imageMultipart, desc)
-            emit(Result.Success(response))
+            val response = apiConfig.uploadImage(
+                token = "Bearer $token",
+                file = imageMultipart,
+                description =  desc,
+                lat = latitude,
+                lon = longitude)
+            emit(Results.Success(response))
         } catch (e: Exception) {
-            emit(Result.Error(e.message.toString()))
+            emit(Results.Error(e.message.toString()))
         }
     }
 
-    fun checkSession(): Flow<UserSession> = userPreferences.getUserSession()
 
     suspend fun doLogout() = userPreferences.destroyUserSession()
-
-    private suspend fun getToken() = userPreferences.getUserSession().first().token.toString()
 
     companion object {
         @Volatile
         private var instance: DataRepository? = null
-        fun getInstance(apiConfig: ApiInterface, userPreferences: UserPreferences): DataRepository =
+        fun getInstance(apiConfig: ApiService, userPreferences: UserPreferences, storyDatabase: StoryDatabase): DataRepository =
             instance ?: synchronized(this) {
-                instance ?: DataRepository(apiConfig, userPreferences)
+                instance ?: DataRepository(apiConfig, userPreferences, storyDatabase)
             }.also { instance = it }
     }
 

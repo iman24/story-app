@@ -8,7 +8,7 @@ import okhttp3.RequestBody
 import retrofit2.http.*
 
 
-interface ApiInterface {
+interface ApiService {
 
     @FormUrlEncoded
     @POST("register")
@@ -25,12 +25,12 @@ interface ApiInterface {
         @Field("password") password: String
     ): LoginResponse
 
+
     @GET("stories")
     suspend fun getAllStories(
-        @Header("Authorization") token: String?,
-        @Query("page") page: String? = null,
-        @Query("size") size: String? = null,
-        @Query("location") location: String? = null
+        @Query("location") location: Int = 1,
+        @Query("page") page: Int? = null,
+        @Query("size") size: Int? = null,
     ): DataStoriesResponse
 
     @Multipart
@@ -39,5 +39,7 @@ interface ApiInterface {
         @Header("Authorization") token: String,
         @Part file: MultipartBody.Part,
         @Part("description") description: RequestBody,
+        @Part("lat") lat: Float,
+        @Part("lon") lon: Float
     ): CommonResponse
 }

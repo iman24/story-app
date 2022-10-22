@@ -6,9 +6,11 @@ import android.content.Intent.ACTION_GET_CONTENT
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat
+import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,12 +18,15 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.imanancin.storyapp1.R
 import com.imanancin.storyapp1.ViewModelFactory
-import com.imanancin.storyapp1.data.remote.Result
+import com.imanancin.storyapp1.data.remote.Results
 import com.imanancin.storyapp1.databinding.ActivityAddStoryBinding
 import com.imanancin.storyapp1.ui.stories.StoriesActivity
 import com.imanancin.storyapp1.utils.Helper
+import timber.log.Timber
 import java.io.OutputStream
 import java.io.InputStream
 import java.io.File
@@ -29,14 +34,16 @@ import java.io.ByteArrayOutputStream
 import java.io.FileOutputStream
 
 
-
 class AddStoryActivity : AppCompatActivity(), View.OnClickListener {
+    private val TAG = "AddStoryActivity"
     private lateinit var binding: ActivityAddStoryBinding
     private lateinit var activity: AddStoryActivity
     private var file: File? = null
     private val viewModel: AddStoryViewModel by viewModels {
         ViewModelFactory.getInstance(activity)
     }
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var myLocation = mutableMapOf<String, Double>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,9 +51,64 @@ class AddStoryActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(binding.root)
         activity = this
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         requestPermission()
         setUpUI()
+        getMyLastLocation()
 
+    }
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            when {
+                permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false -> {
+                    // Precise location access granted.
+                    getMyLastLocation()
+                }
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false -> {
+                    // Only approximate location access granted.
+                    getMyLastLocation()
+                }
+                else -> {
+                    // No location access granted.
+                }
+            }
+        }
+
+    private fun checkPermission(permission: String): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            permission
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+    private fun getMyLastLocation() {
+        if     (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) &&
+            checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+        ){
+
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    myLocation["lat"] = location.latitude
+                    myLocation["lon"] = location.longitude
+                } else {
+                    Toast.makeText(
+                        activity,
+                        getString(R.string.location_not_found),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+        } else {
+            requestPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
     }
 
     private fun setUpUI() {
@@ -58,15 +120,6 @@ class AddStoryActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private fun requestPermission() {
-        if (!allPermissionsGranted()) {
-            ActivityCompat.requestPermissions(
-                this,
-                REQUIRED_PERMISSIONS,
-                REQUEST_CODE_PERMISSIONS
-            )
-        }
-    }
 
     private val launcherIntentCamera = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -83,6 +136,7 @@ class AddStoryActivity : AppCompatActivity(), View.OnClickListener {
     ) { res ->
         if (res.resultCode == RESULT_OK) {
             val img: Uri = res.data?.data as Uri
+            Timber.tag("URI").e(img.toString())
             file = convertUriToFile(img)
             binding.ivPreview.setImageURI(img)
         }
@@ -140,28 +194,29 @@ class AddStoryActivity : AppCompatActivity(), View.OnClickListener {
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
-                    viewModel.uploadImage(file!!, binding.edAddDescription.text.toString())
+                    Timber.tag(TAG).e(myLocation.toString())
+                    viewModel.uploadImage(file!!, binding.edAddDescription.text.toString(), myLocation.get("lat")!!, myLocation.get("lon")!!)
                         .observe(activity) { result ->
                             if (result != null) {
                                 when (result) {
-                                    is Result.Loading -> {
+                                    is Results.Loading -> {
                                         showLoading(true)
                                     }
-                                    is Result.Success -> {
+                                    is Results.Success -> {
                                         Intent(activity, StoriesActivity::class.java).apply {
                                             startActivity(this)
                                             Toast.makeText(
                                                 activity,
-                                                result.data.message,
+                                                result.data?.message,
                                                 Toast.LENGTH_SHORT
                                             ).show()
                                             finishAffinity()
                                         }
                                     }
-                                    is Result.Error -> {
+                                    is Results.Error -> {
                                         Toast.makeText(
                                             activity,
-                                            result.exception,
+                                            result.message,
                                             Toast.LENGTH_SHORT
                                         ).show()
                                         showLoading(false)
@@ -193,6 +248,16 @@ class AddStoryActivity : AppCompatActivity(), View.OnClickListener {
         ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
 
+    private fun requestPermission() {
+        if (!allPermissionsGranted()) {
+            ActivityCompat.requestPermissions(
+                this,
+                REQUIRED_PERMISSIONS,
+                REQUEST_CODE_PERMISSIONS
+            )
+        }
+    }
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -200,17 +265,34 @@ class AddStoryActivity : AppCompatActivity(), View.OnClickListener {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (!allPermissionsGranted()) {
-                Toast.makeText(
-                    this,
-                    getString(R.string.granted_camera_permission),
-                    Toast.LENGTH_SHORT
-                ).show()
-                binding.buttonCamera.isEnabled = false
+
+            permissions.forEachIndexed { index, _ ->
+                if(permissions[index] == Manifest.permission.CAMERA &&
+                    grantResults[index] == PackageManager.PERMISSION_DENIED) {
+                        Toast.makeText(
+                            this,
+                            getString(R.string.granted_camera_permission),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        binding.buttonCamera.isEnabled = false
+                    }
+
+                if((permissions[index] == Manifest.permission.ACCESS_FINE_LOCATION ||
+                    permissions[index] == Manifest.permission.ACCESS_COARSE_LOCATION) &&
+                    grantResults[index] == PackageManager.PERMISSION_DENIED) {
+                        Toast.makeText(
+                            this,
+                            getString(R.string.granted_location_permission),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                }
             }
         }
     }
+
+
 
     companion object {
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
