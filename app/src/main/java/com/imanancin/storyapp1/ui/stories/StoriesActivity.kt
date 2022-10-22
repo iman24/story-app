@@ -8,22 +8,32 @@ import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.util.Pair
+import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.test.core.app.ActivityScenario.launch
 import com.imanancin.storyapp1.R
 import com.imanancin.storyapp1.ViewModelFactory
-import com.imanancin.storyapp1.data.remote.Result
-import com.imanancin.storyapp1.data.remote.response.StoryItem
+import com.imanancin.storyapp1.data.UserPreferences
+import com.imanancin.storyapp1.data.local.entity.StoryEntity
+import com.imanancin.storyapp1.data.remote.response.Stories
 import com.imanancin.storyapp1.databinding.ActivityStoriesBinding
 import com.imanancin.storyapp1.databinding.ItemStoriesBinding
+import com.imanancin.storyapp1.di.Injection
 import com.imanancin.storyapp1.ui.add.AddStoryActivity
 import com.imanancin.storyapp1.ui.login.LoginActivity
+import com.imanancin.storyapp1.ui.maps.MapsActivity
 import com.imanancin.storyapp1.ui.storydetail.StoryDetailActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 
 class StoriesActivity : AppCompatActivity(), View.OnClickListener {
@@ -34,6 +44,7 @@ class StoriesActivity : AppCompatActivity(), View.OnClickListener {
         ViewModelFactory.getInstance(activity)
     }
 
+
     private lateinit var storiesAdapter: StoriesAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +54,7 @@ class StoriesActivity : AppCompatActivity(), View.OnClickListener {
         supportActionBar?.show()
         activity = this
 
+
         setUpUi()
         viewModel()
     }
@@ -51,7 +63,7 @@ class StoriesActivity : AppCompatActivity(), View.OnClickListener {
         binding.btnAdd.setOnClickListener(this)
         storiesAdapter = StoriesAdapter()
         storiesAdapter.setOnClickListener(object : StoriesAdapter.OnClickListener {
-            override fun onClick(data: StoryItem?, view: ItemStoriesBinding) {
+            override fun onClick(data: StoryEntity?, view: ItemStoriesBinding) {
                 val optionsCompat: Bundle? =
                     ActivityOptionsCompat.makeSceneTransitionAnimation(
                         activity,
@@ -65,17 +77,21 @@ class StoriesActivity : AppCompatActivity(), View.OnClickListener {
             }
         })
 
+
         binding.rvStories.apply {
             layoutManager = GridLayoutManager(activity, 2)
-            adapter = storiesAdapter
+            adapter = storiesAdapter.withLoadStateFooter(
+                footer = LoadingStateAdapter {
+                    storiesAdapter.retry()
+                }
+            )
         }
     }
 
     private fun viewModel() {
-
-
-        viewModel.session().observe(this) { session ->
-            if (session.token == "") {
+        lifecycleScope.launch {
+            val userPreferences = Injection.provideUserPreferences(this@StoriesActivity).getUserSession().first()
+            if (userPreferences.token == "") {
                 Intent(activity, LoginActivity::class.java).apply {
                     startActivity(this)
                     finishAffinity()
@@ -83,31 +99,18 @@ class StoriesActivity : AppCompatActivity(), View.OnClickListener {
             }
         }
 
-        viewModel.getData().observe(this) { result ->
-            val progressBar = binding.pbLoading
-            if (result != null) {
-                when (result) {
-                    is Result.Loading -> {
-                        progressBar.visibility = View.VISIBLE
-                    }
-                    is Result.Success -> {
-                        progressBar.visibility = View.GONE
-                        if (result.data.listStory?.size == 0) {
-                            Toast.makeText(
-                                activity,
-                                getString(R.string.data_empty),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            storiesAdapter.submitList(result.data.listStory)
-                        }
-
-                    }
-                    is Result.Error -> {
-                        progressBar.visibility = View.GONE
-                    }
-                }
+        storiesAdapter.addLoadStateListener { loadState ->
+            if (loadState.source.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && storiesAdapter.itemCount < 1) {
+                binding.rvStories.isVisible = false
+                binding.noData.isVisible = true
+            } else {
+                binding.rvStories.isVisible = true
+                binding.noData.isVisible = false
             }
+        }
+
+        viewModel.getData().observe(this) { result ->
+            storiesAdapter.submitData(lifecycle, result)
         }
     }
 
@@ -140,6 +143,10 @@ class StoriesActivity : AppCompatActivity(), View.OnClickListener {
             R.id.btn_lang -> {
                 startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
                 true
+            }
+            R.id.btn_location -> {
+                startActivity(Intent(activity, MapsActivity::class.java))
+                return true
             }
             else -> true
         }

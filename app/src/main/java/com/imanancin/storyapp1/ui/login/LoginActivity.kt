@@ -12,7 +12,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.imanancin.storyapp1.R
 import com.imanancin.storyapp1.ViewModelFactory
-import com.imanancin.storyapp1.data.remote.Result
+import com.imanancin.storyapp1.data.remote.Results
 import com.imanancin.storyapp1.databinding.ActivityLoginBinding
 import com.imanancin.storyapp1.ui.customviews.EditTextCustomView
 import com.imanancin.storyapp1.ui.register.RegisterActivity
@@ -114,17 +114,17 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
                 ).observe(activity) { result ->
                     if(result != null) {
                         when(result) {
-                            is Result.Loading -> {
+                            is Results.Loading -> {
                                 showLoading(true)
                             }
-                            is Result.Success -> {
+                            is Results.Success -> {
                                 Intent(activity, StoriesActivity::class.java).apply {
                                     startActivity(this)
                                     finish()
                                 }
                             }
-                            is Result.Error -> {
-                                Toast.makeText(activity, result.exception, Toast.LENGTH_SHORT).show()
+                            is Results.Error -> {
+                                Toast.makeText(activity, result.message, Toast.LENGTH_SHORT).show()
                                 showLoading(false)
                             }
                         }

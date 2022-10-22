@@ -2,7 +2,6 @@ package com.imanancin.storyapp1.ui.widget
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Binder
 import android.util.Log
@@ -12,7 +11,7 @@ import androidx.core.os.bundleOf
 import com.bumptech.glide.Glide
 import com.imanancin.storyapp1.R
 import com.imanancin.storyapp1.data.DataRepository
-import com.imanancin.storyapp1.data.remote.response.StoryItem
+import com.imanancin.storyapp1.data.remote.response.Stories
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
@@ -22,7 +21,7 @@ internal class StackRemoteViewsFactory(
     private val dataRepository: DataRepository
 ) : RemoteViewsService.RemoteViewsFactory {
 
-    private val mWidgetItems = ArrayList<StoryItem>()
+    private val mWidgetItems = ArrayList<Stories>()
     private val job = SupervisorJob()
     private val coroutineScope = CoroutineScope(Dispatchers.IO + job)
 

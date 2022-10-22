@@ -33,4 +33,10 @@
     <string name="app_widget_description">This is an app widget description</string>
     <string name="empty_text">Empty Text</string>
     <string name="data_empty">No Data</string>
+    <string name="title_activity_maps">Story App Maps</string>
+    <string name="story_location">Story in maps</string>
+    <string name="error_load_data">Error load data story</string>
+    <string name="granted_location_permission">Granted for loaction permission</string>
+    <string name="location_not_found">Location not found</string>
+    <string name="retry">Try again</string>
 </resources>
