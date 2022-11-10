@@ -1,35 +1,88 @@
-# scenario tes login (LoginViewModel)
-1. Saat berhasil login
-    - Memastikan data tidak null
-    - Memastikan data mengembalikan Result.Success
-    - Memastikan token tersedia
-2. Saat gagal login
-    - memastikan data tidak null
-    - memastikan data mengembalikkan Result.Error
+- UNIT TESTING
+A. scenario tes login (LoginViewModel)
+    1. Saat berhasil login
+        - Memastikan data tidak null
+        - Memastikan data mengembalikan Result.Success
+        - Memastikan data tidak terdapat Result.Error
+        - Memastikan response json terdapat data dengan error false
+        - Memastikan token tersedia
+    2. Saat gagal login
+        - memastikan data tidak null
+        - memastikan data response Result.Success
+        - Memastikan response json terdapat data dengan error true
 
-# sceneario register (RegisterViewModel)
-1. saat berhasil register
-    - Memastikan data tidak null
-    - Memastikan data mengembalikan Result.Success
-2. Saat gagal register
-    - Memastikan data tidak null
-    - Memastikan data mengembalikkan Result.Error
+B. sceneario register (RegisterViewModel)
+    1. saat berhasil register
+        - Memastikan data tidak null
+        - Memastikan data mengembalikan Result.Success
+        - Memastikan data tidak mengembalikan Result.Error
+        - Memastikan response json terdapat data dengan error false
+
+    2. Saat gagal register/email sudah ada
+        - Memastikan data tidak null
+        - Memastikan data mengembalikkan Result.Sucess response
+        - Memastikan response json terdapat data dengan error true
 
 
-# scenario tambah story (AddStoryViewModel)
-1. saat berhasil menambah story
-    - memastikan data tidak null
-    - memastikan data mengembalikkan Result.SUccess
+C. scenario tambah story (AddStoryViewModel)
+    1. saat berhasil menambah story
+        - memastikan data tidak null
+        - memastikan data mengembalikkan Result.SUccess
+        - Memastikan response json terdapat data dengan error false
 
 
-# scenarion mengambil data story (StoryViewModel)
-1. saat berhasil mengambil data story
-    - memastikan data tidak null
-    - memastikan status Result.Success adalah true
-    - memastikan status Result.Error adalalah false
-    - memastikan jumlah data tidak sama dengan 0
+D. scenario mengambil data story (StoryViewModel)
+    1. saat gagal mengambil data story
+        - memastikan data tidak  null
+        - memastikan data dummy sama dengan data snapshot
+        - memastikan ukuran data dummy dama dengan data snapshot
+        - memastikan nama story sama dengan nama di snapshot
 
-2. saat gagal mengambil data story
-    - memastikan data null
-    - memastikan status Result.Error true
-    - memastikan status Result.Success false
+D. scenario mengambil data story map (MapViewModel)
+    1. saat gagal mengambil data story
+        - memastikan data tidak  null
+        - memastikan data dummy sama dengan data snapshot
+        - memastikan ukuran data dummy dama dengan data snapshot
+        - memastikan nama story sama dengan nama di snapshot
+
+
+E. scenario repository
+    1. skenario test repository login
+        - memastikan data tidak null
+        - memastikan data Result.Success == true saat berhasil login
+        - memastikan data Result.Error == false saat berhasil login
+        - memastikan json error == false
+        - memastikan message bernilai sama antara actual response dengan expected response
+
+    2. skenario test repository register
+        - memastikan data tidak null
+        - memastikan data Result.Success == true saat berhasil register
+        - memastikan data Result.Error == false saat berhasil register
+        - memastikan json error == false
+        - memastikan message bernilai sama antara actual response dengan expected response
+
+    3. skenario test repository add story
+        - memastikan data tidak null
+        - memastikan data Result.Success == true saat berhasil menambah story
+        - memastikan data Result.Error == false saat berhasil menambah story
+        - memastikan json error == false
+        - memastikan message bernilai sama antara actual response dengan expected response
+
+     4. skenario test repository get data dari database
+        - memastikan data tidak null
+        - memastikan data size bernilai sama antara actual data dan expected data
+
+F. scenario remote mediator
+    - memastikan fungsi load/result mengembalikan RemoteMediator.MediatorResult.Success
+    - Memastikan jumlah endOfPaginationReached bernilai false
+
+- END TO END TESTING
+    - memastikan activity registrasi terdapat edittext nama, email, password dan tombol registrasi
+    - memastikan activity login terdapat edittext email, password dan tombol login
+    - memastikan activity story terdapat recycler view dan tombol tambah story
+    - memastikan activity story-detail terdapat gambar, nama, dan deskripsi story
+    - memastikan activity add story terdapat tombol kamera, galery, edittext deskripsi dan tombol uplaod
+    - memastikan activity map terdapat fragmentcontainerview
+
+
+

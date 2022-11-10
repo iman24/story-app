@@ -3,17 +3,16 @@ package com.imanancin.storyapp1.ui.maps
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.imanancin.storyapp1.data.DataRepository
-import com.imanancin.storyapp1.data.remote.Results
-import com.imanancin.storyapp1.data.remote.response.DataStoriesResponse
+import com.imanancin.storyapp1.data.local.entity.StoryEntity
 
 class MapsViewModel(
     dataRepository: DataRepository
 ): ViewModel() {
 
-    private val data: LiveData<Results<DataStoriesResponse>> = dataRepository.getListStoryMaps()
+    val datas: LiveData<List<StoryEntity>> = dataRepository.getListStoryDB()
 
-    fun getData(): LiveData<Results<DataStoriesResponse>> {
-        return data
+    fun getData(): LiveData<List<StoryEntity>> {
+        return datas
     }
 
 }

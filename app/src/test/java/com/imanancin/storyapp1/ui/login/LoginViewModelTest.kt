@@ -5,19 +5,19 @@ import androidx.lifecycle.MutableLiveData
 import com.imanancin.storyapp1.DataDummy
 import com.imanancin.storyapp1.MainDispatcherRule
 import com.imanancin.storyapp1.data.DataRepository
+import com.imanancin.storyapp1.data.remote.Results
 import com.imanancin.storyapp1.data.remote.response.LoginResponse
+import com.imanancin.storyapp1.getOrAwaitValue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.junit.MockitoJUnitRunner
-import com.imanancin.storyapp1.data.remote.Results
-import com.imanancin.storyapp1.getOrAwaitValue
-import org.junit.Assert
 import org.mockito.Mockito
+import org.mockito.junit.MockitoJUnitRunner
 
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
@@ -51,7 +51,7 @@ class LoginViewModelTest {
         Assert.assertTrue(result is Results.Success)
         Assert.assertFalse(result is Results.Error)
         result.data?.error?.let { Assert.assertFalse(it) }
-        println(result.data.toString())
+        Assert.assertNotNull(result.data?.loginResult?.token)
 
     }
 
@@ -59,13 +59,13 @@ class LoginViewModelTest {
     fun `when login failed`() = runTest {
 
         val expectedResponse = MutableLiveData<Results<LoginResponse>>()
-        expectedResponse.value = Results.Success(DataDummy.loginResponse("true"))
+        expectedResponse.value = Results.Error("", LoginResponse())
         Mockito.`when`(dataRepository.doLogin(email, password)).thenReturn(expectedResponse)
         val result = loginViewModel.authenticateLogin(email, password).getOrAwaitValue()
         Mockito.verify(dataRepository).doLogin(email, password)
         Assert.assertNotNull(result.data)
-        Assert.assertTrue(result is Results.Success)
-        Assert.assertFalse(result is Results.Error)
+        Assert.assertTrue(result is Results.Error)
+        Assert.assertFalse(result is Results.Success)
         result.data?.error?.let { Assert.assertTrue(it) }
     }
 }

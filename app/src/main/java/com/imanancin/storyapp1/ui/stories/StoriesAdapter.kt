@@ -14,7 +14,6 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.imanancin.storyapp1.data.local.entity.StoryEntity
-import com.imanancin.storyapp1.data.remote.response.Stories
 import com.imanancin.storyapp1.databinding.ItemStoriesBinding
 
 class StoriesAdapter : PagingDataAdapter<StoryEntity, StoriesAdapter.ViewHolder>(DIFF){

@@ -7,6 +7,7 @@ import com.imanancin.storyapp1.MainDispatcherRule
 import com.imanancin.storyapp1.data.DataRepository
 import com.imanancin.storyapp1.data.remote.Results
 import com.imanancin.storyapp1.data.remote.response.CommonResponse
+import com.imanancin.storyapp1.data.remote.response.LoginResponse
 import com.imanancin.storyapp1.getOrAwaitValue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.*
@@ -49,21 +50,19 @@ class RegisterViewModelTest {
         assertTrue(result is Results.Success)
         assertFalse(result is Results.Error)
         result.data?.error?.let { assertFalse(it) }
-        println(result.data.toString())
     }
 
     @Test
     fun `when register failed or email is already taken`() {
         val expectedResponse = MutableLiveData<Results<CommonResponse>>()
-        expectedResponse.value = Results.Success(DataDummy.registerFailedResponse())
+        expectedResponse.value = Results.Error("", CommonResponse())
         Mockito.`when`(dataRepository.doRegister(name, email, password)).thenReturn(expectedResponse)
         val result = registerViewModel.doRegister(name, email, password).getOrAwaitValue()
         Mockito.verify(dataRepository).doRegister(name, email, password)
         assertNotNull(result.data)
-        assertTrue(result is Results.Success)
-        assertFalse(result is Results.Error)
+        assertTrue(result is Results.Error)
+        assertFalse(result is Results.Success)
         result.data?.error?.let { assertTrue(it) }
-        println(result.data.toString())
     }
 
 

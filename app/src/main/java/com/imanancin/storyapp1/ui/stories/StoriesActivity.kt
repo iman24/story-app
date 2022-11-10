@@ -15,15 +15,11 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.core.util.Pair
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.test.core.app.ActivityScenario.launch
 import com.imanancin.storyapp1.R
 import com.imanancin.storyapp1.ViewModelFactory
-import com.imanancin.storyapp1.data.UserPreferences
 import com.imanancin.storyapp1.data.local.entity.StoryEntity
-import com.imanancin.storyapp1.data.remote.response.Stories
 import com.imanancin.storyapp1.databinding.ActivityStoriesBinding
 import com.imanancin.storyapp1.databinding.ItemStoriesBinding
 import com.imanancin.storyapp1.di.Injection
@@ -31,7 +27,7 @@ import com.imanancin.storyapp1.ui.add.AddStoryActivity
 import com.imanancin.storyapp1.ui.login.LoginActivity
 import com.imanancin.storyapp1.ui.maps.MapsActivity
 import com.imanancin.storyapp1.ui.storydetail.StoryDetailActivity
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -43,6 +39,7 @@ class StoriesActivity : AppCompatActivity(), View.OnClickListener {
     private val viewModel: StoriesViewModel by viewModels {
         ViewModelFactory.getInstance(activity)
     }
+    val userPreferences = Injection.provideUserPreferences(this)
 
 
     private lateinit var storiesAdapter: StoriesAdapter
@@ -53,6 +50,7 @@ class StoriesActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(binding.root)
         supportActionBar?.show()
         activity = this
+
 
 
         setUpUi()
@@ -133,7 +131,10 @@ class StoriesActivity : AppCompatActivity(), View.OnClickListener {
                             startActivity(this)
                             finish()
                         }
-                        viewModel.logout()
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            userPreferences.destroyUserSession()
+                        }
+
                     }
                 }.show()
 
