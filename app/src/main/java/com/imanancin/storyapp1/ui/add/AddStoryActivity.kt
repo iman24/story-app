@@ -10,7 +10,6 @@ import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,11 +26,7 @@ import com.imanancin.storyapp1.databinding.ActivityAddStoryBinding
 import com.imanancin.storyapp1.ui.stories.StoriesActivity
 import com.imanancin.storyapp1.utils.Helper
 import timber.log.Timber
-import java.io.OutputStream
-import java.io.InputStream
-import java.io.File
-import java.io.ByteArrayOutputStream
-import java.io.FileOutputStream
+import java.io.*
 
 
 class AddStoryActivity : AppCompatActivity(), View.OnClickListener {
@@ -87,7 +82,6 @@ class AddStoryActivity : AppCompatActivity(), View.OnClickListener {
         if     (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) &&
             checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
         ){
-
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 if (location != null) {
                     myLocation["lat"] = location.latitude
@@ -187,6 +181,16 @@ class AddStoryActivity : AppCompatActivity(), View.OnClickListener {
                 pickImage()
             }
             R.id.button_add -> {
+
+                if(myLocation["lat"] == null && myLocation["lon"] == null) {
+                    requestPermission()
+                    Toast.makeText(
+                        activity,
+                        getString(R.string.location_ask),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return
+                }
                 if (file == null) {
                     Toast.makeText(
                         activity,
@@ -195,7 +199,7 @@ class AddStoryActivity : AppCompatActivity(), View.OnClickListener {
                     ).show()
                 } else {
                     Timber.tag(TAG).e(myLocation.toString())
-                    viewModel.uploadImage(file!!, binding.edAddDescription.text.toString(), myLocation.get("lat")!!, myLocation.get("lon")!!)
+                    viewModel.uploadImage(file!!, binding.edAddDescription.text.toString(), myLocation["lat"] ?: 0.0, myLocation["lon"] ?: 0.0)
                         .observe(activity) { result ->
                             if (result != null) {
                                 when (result) {
@@ -295,7 +299,7 @@ class AddStoryActivity : AppCompatActivity(), View.OnClickListener {
 
 
     companion object {
-        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
         private const val REQUEST_CODE_PERMISSIONS = 10
     }
 }

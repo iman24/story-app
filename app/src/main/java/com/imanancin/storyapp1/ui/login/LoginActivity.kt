@@ -78,7 +78,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     private fun setupUi() {
 
         with(binding) {
-            registerHere!!.setOnClickListener(activity)
+            registerHere.setOnClickListener(activity)
             edLoginEmail.listener()
             edLoginPassword.listener()
             btnLogin.setOnClickListener(activity)

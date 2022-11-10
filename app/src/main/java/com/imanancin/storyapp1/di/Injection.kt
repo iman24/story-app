@@ -9,6 +9,7 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import com.imanancin.storyapp1.BuildConfig
 import com.imanancin.storyapp1.data.DataRepository
 import com.imanancin.storyapp1.data.UserPreferences
+import com.imanancin.storyapp1.data.local.database.StoryDao
 import com.imanancin.storyapp1.data.local.database.StoryDatabase
 import com.imanancin.storyapp1.data.remote.ApiService
 import kotlinx.coroutines.*
@@ -65,8 +66,12 @@ class Injection {
             return retrofit.create(ApiService::class.java)
         }
 
-        fun provideStoryDatabase(context: Context): StoryDatabase {
+        private fun provideStoryDatabase(context: Context): StoryDatabase {
             return StoryDatabase.getDatabase(context)
+        }
+
+        private fun provideStoryDatabaseDao(context: Context): StoryDao {
+            return StoryDatabase.getDatabase(context).storyDao()
         }
 
 
@@ -86,7 +91,8 @@ class Injection {
             return DataRepository.getInstance(
                 provideApiService(context),
                 provideUserPreferences(context),
-                provideStoryDatabase(context)
+                provideStoryDatabase(context),
+                provideStoryDatabaseDao(context)
             )
         }
 

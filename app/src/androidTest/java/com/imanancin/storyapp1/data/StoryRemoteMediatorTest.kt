@@ -12,13 +12,14 @@ import com.imanancin.storyapp1.data.remote.response.DataStoriesResponse
 import com.imanancin.storyapp1.data.remote.response.LoginResponse
 import com.imanancin.storyapp1.data.remote.response.Stories
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExperimentalPagingApi
@@ -87,13 +88,12 @@ class FakeApiService : ApiService {
     }
 
     override suspend fun uploadImage(
-        token: String,
         file: MultipartBody.Part,
         description: RequestBody,
         lat: Float,
         lon: Float
     ): CommonResponse {
-        TODO("Not yet implemented")
+        return CommonResponse(false, "")
     }
 
 }

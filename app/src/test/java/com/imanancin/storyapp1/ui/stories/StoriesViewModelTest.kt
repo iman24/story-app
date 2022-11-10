@@ -16,7 +16,8 @@ import com.imanancin.storyapp1.getOrAwaitValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,7 +41,7 @@ class StoriesViewModelTest {
 
     @Test
     fun `when Get Stories Should Not Null and Return Success`() = runTest {
-        val dummyStories = DataDummy.generateDummyStoriesResponse()
+        val dummyStories = DataDummy.generateDummyStories()
         val data: PagingData<StoryEntity> = StoryPagingSource.snapshot(dummyStories)
         val expectedQuote = MutableLiveData<PagingData<StoryEntity>>()
         expectedQuote.value = data

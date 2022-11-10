@@ -3,13 +3,12 @@ package com.imanancin.storyapp1.ui.maps
 import android.Manifest
 import android.content.pm.PackageManager
 import android.content.res.Resources
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -20,7 +19,6 @@ import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import com.imanancin.storyapp1.R
 import com.imanancin.storyapp1.ViewModelFactory
-import com.imanancin.storyapp1.data.remote.Results
 import com.imanancin.storyapp1.databinding.ActivityMapsBinding
 import timber.log.Timber
 
@@ -54,7 +52,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
         setupViewModel()
         mapUiSettings()
-//        setMapStyle()
+        setMapStyle()
         getMyLocation()
 
 
@@ -62,23 +60,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun setupViewModel() {
         viewModel.getData().observe(this) { result ->
-            Timber.tag(TAG).e(result.toString())
-            when (result) {
-                is Results.Error -> {
-                    Toast.makeText(activity, getString(R.string.error_load_data), Toast.LENGTH_SHORT).show()
-                }
-                is Results.Loading -> {
-
-                }
-                is Results.Success -> {
-                    result.data?.listStory?.forEach { item ->
-                        val latLng = LatLng(item.lat ?: 0.0, item.lon ?: 0.0)
-                        mMap.addMarker(MarkerOptions()
-                            .position(latLng)
-                            .title(item.name)
-                            .snippet(item.description))
-                        boundsBuilder(latLng)
-                    }
+            if(result == null) {
+                Toast.makeText(this, getString(R.string.error_load_data), Toast.LENGTH_SHORT).show()
+            } else {
+                result.forEach { item ->
+                    val latLng = LatLng(item.lat ?: 0.0, item.lon ?: 0.0)
+                    mMap.addMarker(
+                        MarkerOptions()
+                        .position(latLng)
+                        .title(item.name)
+                        .snippet(item.description))
+                    boundsBuilder(latLng)
                 }
             }
         }
