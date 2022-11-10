@@ -34,4 +34,13 @@
     <string name="app_widget_description">Ini deskripsi widget</string>
     <string name="empty_text">Teks kosong</string>
     <string name="data_empty">Data Kosong</string>
+    <string name="title_activity_maps">Story App Maps</string>
+    <string name="story_location">Story in maps</string>
+    <string name="error_load_data">Gagal memuat data story</string>
+    <string name="granted_location_permission">Izinkan akses lokasi</string>
+    <string name="location_not_found">Lokasi tidak ditemukan</string>
+    <string name="retry">Coba lagi</string>
+    <string name="story_image">Story image</string>
+    <string name="location_ask">mohon untuk memeberikan izin lokasi untuk aplikasi ini</string>
+
 </resources>

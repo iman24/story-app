@@ -2,7 +2,6 @@ package com.imanancin.storyapp1.ui.widget
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Binder
 import android.util.Log
@@ -11,18 +10,20 @@ import android.widget.RemoteViewsService
 import androidx.core.os.bundleOf
 import com.bumptech.glide.Glide
 import com.imanancin.storyapp1.R
-import com.imanancin.storyapp1.data.DataRepository
-import com.imanancin.storyapp1.data.remote.response.StoryItem
+import com.imanancin.storyapp1.data.remote.ApiService
+import com.imanancin.storyapp1.data.remote.response.Stories
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 
 internal class StackRemoteViewsFactory(
     private val mContext: Context,
-    private val dataRepository: DataRepository
+    private val apiService: ApiService
 ) : RemoteViewsService.RemoteViewsFactory {
 
-    private val mWidgetItems = ArrayList<StoryItem>()
+    private val mWidgetItems = ArrayList<Stories>()
     private val job = SupervisorJob()
     private val coroutineScope = CoroutineScope(Dispatchers.IO + job)
 
@@ -31,7 +32,7 @@ internal class StackRemoteViewsFactory(
         coroutineScope.launch {
 
             try {
-                dataRepository.storyWidget().collectLatest { _list ->
+                storyWidget().collectLatest { _list ->
                     mWidgetItems.addAll(_list)
                 }
             }catch (e:Exception){
@@ -41,10 +42,31 @@ internal class StackRemoteViewsFactory(
         Binder.restoreCallingIdentity(identityToken)
     }
 
+    fun storyWidget(): Flow<List<Stories>> = flow {
+        try {
+            val response = apiService.getAllStories()
+            val data = response.listStory.map { story ->
+                with(story) {
+                    Stories(
+                        photoUrl = photoUrl,
+                        createdAt = createdAt,
+                        name = name,
+                        description = description,
+                        lon = lon,
+                        id = id,
+                        lat = lat)
+                }
+            }
+            emit(data)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
 
 
     override fun onDataSetChanged() {
-        mWidgetItems.addAll(runBlocking { dataRepository.storyWidget().first() })
+        mWidgetItems.addAll(runBlocking { storyWidget().first() })
     }
 
     override fun onDestroy() {

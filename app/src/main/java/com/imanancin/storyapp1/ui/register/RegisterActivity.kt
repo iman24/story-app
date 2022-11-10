@@ -4,18 +4,18 @@ package com.imanancin.storyapp1.ui.register
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import com.imanancin.storyapp1.R
-import com.imanancin.storyapp1.data.remote.Result
+import com.imanancin.storyapp1.ViewModelFactory
+import com.imanancin.storyapp1.data.remote.Results
 import com.imanancin.storyapp1.databinding.ActivityRegisterBinding
 import com.imanancin.storyapp1.ui.customviews.EditTextCustomView
-import com.imanancin.storyapp1.ViewModelFactory
 import com.imanancin.storyapp1.ui.login.LoginActivity
 import com.imanancin.storyapp1.ui.stories.StoriesActivity
 
@@ -116,16 +116,16 @@ class RegisterActivity : AppCompatActivity(), View.OnClickListener {
                 ).observe(activity) { result ->
                     if(result != null) {
                         when(result) {
-                            is Result.Loading -> {
+                            is Results.Loading -> {
                                 showLoading(true)
                             }
-                            is Result.Success -> {
+                            is Results.Success -> {
                                 Intent(activity, StoriesActivity::class.java).apply {
                                     startActivity(this)
                                     finish()
                                 }
                             }
-                            is Result.Error -> {
+                            is Results.Error -> {
                                 Toast.makeText(activity, "Invalid Login", Toast.LENGTH_SHORT).show()
                                 showLoading(false)
                             }

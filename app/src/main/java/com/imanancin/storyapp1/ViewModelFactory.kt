@@ -7,6 +7,7 @@ import com.imanancin.storyapp1.data.DataRepository
 import com.imanancin.storyapp1.di.Injection
 import com.imanancin.storyapp1.ui.add.AddStoryViewModel
 import com.imanancin.storyapp1.ui.login.LoginViewModel
+import com.imanancin.storyapp1.ui.maps.MapsViewModel
 import com.imanancin.storyapp1.ui.register.RegisterViewModel
 import com.imanancin.storyapp1.ui.stories.StoriesViewModel
 
@@ -31,6 +32,10 @@ class ViewModelFactory(
 
         if (modelClass.isAssignableFrom(AddStoryViewModel::class.java)) {
             return AddStoryViewModel(repository) as T
+        }
+
+        if (modelClass.isAssignableFrom(MapsViewModel::class.java)) {
+            return MapsViewModel(repository) as T
         }
 
         throw IllegalArgumentException("Unknown ViewModel class: " + modelClass.name)
